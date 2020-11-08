@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆界面</title>
+    <link href="/layui/css/layui.css" rel="stylesheet">
+    <script src="/layui/layui.js"></script>
+    <style type="text/css">
+        /*.loginbody {*/
+            /*background: url("images/login_bg.jpg") no-repeat center center;*/
+        /*}*/
+
+        .loginBox {
+            position: absolute;
+            top: 50px;
+            right: 450px;
+            width: 300px;
+            height: 150px;
+        }
+
+        #loginform {
+            background: rgba(0, 0, 0, 0.1);
+            height: 270px;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body class="loginbody" style="background: url('../images/login_bg.jpg') no-repeat center">
+<div id="loginform" class="loginBox">
+    <form class="layui-form" style="height:450px;">
+        <div align="center" class="layui-center layui-anim-rotate layui-bg-orange layui-btn-radius"
+             style="font-size: 25px; margin-bottom: 15px; ">欢迎登录
+        </div>
+        <div class="layui-form-item input-item">
+            <label for="userName">用户名</label>
+            <input type="text" placeholder="请输入用户名" autocomplete="off" id="userName" class="layui-input"
+                   lay-verify="required" name="username">
+        </div>
+        <div class="layui-form-item input-item">
+            <label for="password">密码</label>
+            <input type="password" placeholder="请输入密码" autocomplete="off" id="password" class="layui-input"
+                   lay-verify="required" name="password">
+        </div>
+        <div class="layui-form-item input-item" id="imgCode">
+            <label for="code">验证码</label>
+            <input type="text" style="width: 180px;" placeholder="请输入验证码" autocomplete="off" id="code"
+                   lay-verify="required" class="layui-input">
+            <img src="/code/createCode" id="verCode"
+                 onclick="this.src='/code/createCode?code=' + new Date()*1"
+                 style=" margin-top: -37px;
+    float: right;"
+            />
+        </div>
+        <div class="layui-form-item">
+            <button id="loginBtn" class="layui-btn layui-block" lay-filter="login" lay-submit>登录</button>
+            <a class="layui-btn layui-btn-sm layui-bg-red" style="float: right" id="showPwd">忘记密码？</a>
+        </div>
+        <div class="code" align="center">
+            <span style="font-size: 18px; color: #FF1493">没有账号？</span> <a id="register" class="layui-icon"
+                                                                          href="javascript:;"
+                                                                          style="color: #FFFF00;">立即注册</a>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'jquery'], function () {
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : top.layer,
+            $ = layui.jquery;
+        //登录按钮
+        form.on("submit(login)", function (data) {
+            var status;
+            console.log(data.field);//当前容器的全部表单字段，名值对形式：{name: value}
+            var codeUrl = '/user/checkCode?code=' + $("#code").val();
+            var codeMethod = 'GET';
+            var msg;
+            $(this).text("登录中...").attr("disabled", "disabled").addClass("layui-disabled");
+            setTimeout(function () {
+                $.ajax({
+                    url: '/user/login',
+                    method: 'post',
+                    data: {
+                        username: data.field.username,
+                        password: data.field.password
+                    },
+                    success: function (res) {
+                        if (res.status) {
+                            status = '正常';
+                            msg = res.message;
+                        } else {
+                            status = '异常';
+                            layer.msg(res.message);
+                            window.location.reload();
+                        }
+                    }
+                });
+                $.ajax({
+                    url: codeUrl,
+                    method: codeMethod,
+                    success: function (res) {
+                        if (res.status) {
+                            window.location.href = '/index.html'
+                        } else {
+                            layer.msg(res.message);
+                            $("#code").val(null);
+                            $("#loginBtn").text("登录").removeAttr("disabled", "disabled").removeClass("layui-disabled");
+                        }
+                    }
+
+                })
+            }, 1000);
+            return false;
+        });
+
+        $("#register").click(function () {
+            layer.open({
+                type: 2,
+                title: '注册用户',
+                content: "register.html",
+                area: ['800px', '500px'],//宽高
+                offset: 'auto',	 //offset默认情况下不用设置。但如果你不想垂直水平居中
+                icon: 1    //只对type=0的效
+                , shade: [0.8, '#F8F8FF']
+                , shadeClose: true  //点击遮罩是否关闭弹层
+                , anim: 4 //设置动画
+                , maxmin: true //是否显示最大化和最小化的按钮 type=1 type=2有效
+            })
+        });
+
+        $("#showPwd").click(function () {
+            layer.open({
+                type: 2,
+                title: '重置密码',
+                content: "showPwd.html",
+                area: ['400px', '400px'],//宽高
+                offset: 'auto',	 //offset默认情况下不用设置。但如果你不想垂直水平居中
+                icon: 1    //只对type=0的效
+                , shade: [0.8, '#F8F8FF']
+                , shadeClose: true  //点击遮罩是否关闭弹层
+                , anim: 4 //设置动画
+                , maxmin: true //是否显示最大化和最小化的按钮 type=1 type=2有效
+            })
+        });
+
+    });
+
+</script>
+</body>
+</html>

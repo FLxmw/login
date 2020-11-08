@@ -1,6 +1,5 @@
 server:
-  port: 80
-
+  port: 8006
 
 spring:
   datasource:
@@ -8,4 +7,28 @@ spring:
     username: root
     password: xmw225310
     driver-class-name: com.mysql.jdbc.Driver
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    servlet:
+      content-type: text/html
+  mail:
+    host: smtp.qq.com
+    username: 2285538755@qq.com
+    password: qcrcudljqwayebgf
+    default-encoding: UTF-8
+
+mybatis:
+  #    指定映射配置文件的位置
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #配置别名扫描的包
+  type-aliases-package: com.feilong.entity
+
+
+
 

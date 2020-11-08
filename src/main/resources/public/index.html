@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/layui/css/layui.css" rel="stylesheet">
+    <script src="/layui/layui.js"></script>
+</head>
+<body>
+<h1 align="center">用户列表信息</h1>
+<table id="userList" lay-filter="userList" align="center"></table>
+<script type="text/javascript">
+    layui.use(['table', 'layer'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        layer.msg("登录成功！");
+
+
+        table.render({
+            //绑定DOM元素 id
+            elem: '#userList',
+            //请求路径
+            url: 'user/showUsers',
+            //开启分页
+            page: true,
+            cellMinWidth: 100, //设置列的最小默认宽度
+            skin: 'row',//行边框风格  row列边框  nob无边框
+            even: true,//开启隔行背景
+            limits: [5, 10, 15, 20, 25],//每页条数的选择项
+            text: {
+                none: '暂无相关数据' //默认：无数据。没有数据的提示文本
+            },
+            cols: [[
+                {type: 'checkbox', fixed: 'left', align: 'center', width: 30},
+                {field: 'id', title: 'ID', align: 'center'},
+                {field: 'username', title: '用户名', align: 'center'},
+                {field: 'password', title: '密码', align: 'center'},
+                {field: 'age', title: '年龄', align: 'center'},
+                {field: 'sex', title: '性别', align: 'center'},
+                {field: 'phone', title: '联系方式', align: 'center'},
+                {field: 'email', title: '电子邮箱', align: 'center'},
+                {field: 'userdesc', title: '用户简介', align: 'center'}
+            ]]
+        })
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+    <link href="/layui/css/layui.css" rel="stylesheet">
+    <script src="/layui/layui.js"></script>
+    <style type="text/css">
+        .layui-form {
+            padding: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<h1 align="center">重置密码</h1>
+<div id="frm" align="center">
+    <form class="layui-form">
+        <div class="layui-form-item input-item">
+            <input type="text" style="width: 180px" placeholder="请输入用户名" autocomplete="off" id="username"
+                   class="layui-input"
+                   lay-verify="required" name="username" th:value="${user.username}">
+        </div>
+        <div class="layui-form-item input-item">
+            <input type="password" style="width: 180px" placeholder="请输入新密码" autocomplete="off" id="pasword"
+                   class="layui-input"
+                   lay-verify="required" name="password">
+        </div>
+
+        <button id="loginBtn" th:align="center" style="margin-top: 20px"
+                class="layui-btn layui-btn-radius layui-btn-warm layui-block" lay-filter="login" lay-submit>确定重置
+        </button>
+    </form>
+</div>
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'jquery'], function () {
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : top.layer,
+            $ = layui.jquery;
+        var status;
+        //登录按钮
+        form.on("submit(login)", function (data) {
+            $.ajax({
+                url: '/user/updatePas',
+                method: 'post',
+                data: {
+                    username: data.field.username,
+                    password: data.field.password
+                },
+                success: function (res) {
+                    if (res.status) {
+                        alert(res.message);
+                        var index = top.layer.msg('正在跳转登陆界面，请稍候....', {icon: 16, time: false, shade: 0.8});
+                        setTimeout(function () {
+                            top.layer.close(index);
+                            layer.closeAll();
+                            window.location.href='/login.html';
+                        }, 3000);
+                    } else {
+                        status = "异常";
+                        layer.msg(res.message);
+                    }
+                }
+            });
+            return false
+        });
+    });
+
+</script>
+</body>
+</html>

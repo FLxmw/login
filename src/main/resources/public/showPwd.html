@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>找回密码</title>
+    <link href="/layui/css/layui.css" rel="stylesheet">
+    <script src="/layui/layui.js"></script>
+    <style type="text/css">
+        .layui-form {
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        #datafrm input {
+            width: 50px;
+            height: 50px;
+            border: #c0c4cc 2px solid;
+            font-size: 50px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+<h1 id="hh" align="center" style="margin-top: 30px;">密码找回</h1>
+<form class="layui-form" id="showForm">
+    <div class="layui-form-item input-item">
+        <input type="text" placeholder="请输入登录名/邮箱" autocomplete="off" id="userIdentify" class="layui-input"
+               lay-verify="required">
+    </div>
+    <div class="code" align="center">
+        <button style="width: 200px;" id="loginBtn" class="layui-btn layui-block layui-bg-orange" lay-filter="login"
+                lay-submit>重置密码
+        </button>
+    </div>
+</form>
+<div id="showInfo" align="center" style="display: none;margin-bottom: 30px; margin-top: 30px;">
+    <form id="datafrm">
+        <input type="text" style="width: 50px" id="num1">
+        <input type="text" style="width: 50px" id="num2">
+        <input type="text" style="width: 50px" id="num3">
+        <input type="text" style="width: 50px" id="num4">
+        <input type="text" style="width: 50px" id="num5">
+        <input type="text" style="width: 50px" id="num6"><br/>
+    </form>
+    <!--<button style="text-align: center" type="button" class="layui-btn layui-bg-green" id="submit">确定</button>-->
+</div>
+<p id="time" style="display: none; float: right; margin-right: 20px; cursor:pointer;"></p>
+<script type="text/javascript">
+    layui.use(['form', 'layer', 'jquery'], function () {
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : top.layer,
+            $ = layui.jquery;
+        var phoneNum;
+        var userIdentify;
+        var emailNum;
+
+        // $("#userIdentify").blur(function () {
+        //     userIdentify = $("#userIdentify").val();
+        // });
+
+        //登录按钮
+        form.on("submit(login)", function (data) {
+            userIdentify = $("#userIdentify").val();
+            // alert(text.lastIndexOf("."));
+            var index = userIdentify.lastIndexOf(".");
+
+            if (index != -1) {
+                alert(userIdentify);
+                $.ajax({
+                    url: '/user/getEmail',
+                    method: 'post',
+                    data: {
+                        email: userIdentify
+                    },
+                    success: function (res) {
+                        alert(res);
+                        emailNum = res;
+                        sendEmail(res)
+                    }
+                })
+            } else {
+                // alert("手机！");
+                $.ajax({
+                    url: '/user/getPhone',
+                    method: 'post',
+                    data: {
+                        username: userIdentify
+                    },
+                    success: function (res) {
+                        phoneNum = res;
+                        sendMessage(res);
+                    }
+                })
+            }
+            return false;
+        });
+
+        function sendEmail(res) {
+            $("#showForm").css("display", "none");
+            $.ajax({
+                url: '/email/sendEmail',
+                method: 'post',
+                data: {
+                    email: res
+                },
+                success: function (data) {
+                    if (data.status) {
+                        layer.msg(data.message);
+                        var str = res;
+                        var prefix = str.substring(0, 4);
+                        var index = str.indexOf("@");
+                        var suffix = str.substring(index);
+                        var email = prefix + "xxxxxxxx" + suffix;
+                        $("#hh").append("<p class='pp' style='margin-top: 30px'>找回密码的链接已发送至你指定的 邮箱" + "<span style='color: red;font-weight: bolder'>" + email + "</span>" + "中，请注意查收!</p>")
+                    }
+                }
+            });
+
+        }
+
+        $("#num6").change(function () {
+            var num1 = $("#num1").val();
+            var num2 = $("#num2").val();
+            var num3 = $("#num3").val();
+            var num4 = $("#num4").val();
+            var num5 = $("#num5").val();
+            var num6 = $("#num6").val();
+            var data = num1 + "" + num2 + "" + num3 + "" + num4 + "" + num5 + "" + num6;
+            layer.msg(data);
+            checkMessage(data);
+
+
+        });
+
+        function checkMessage(data) {
+            $.ajax({
+                url: '/user/checkMessage',
+                method: 'post',
+                data: {
+                    message: data
+                },
+                success: function (res) {
+                    if (res.status) {
+                        $("#datafrm").append("<a class='layui-btn  layui-bg-blue' style='text-align: center; width: 200px; margin-top: 20px' href='/user/toUpdatePwd'>确定</a>")
+                    }
+                    layer.msg(res.message);
+                }
+            });
+        }
+
+        var timer = null;
+
+        function sendMessage(res) {
+            $("#showForm").css("display", "none");
+            $("#showInfo").css("display", "block");
+            $.ajax({
+                url: '/send/sendMessage',
+                method: 'post',
+                data: {
+                    phone: res,
+                    userIdentify: userIdentify
+                },
+                success: function (data) {
+                    if (data.status) {
+                        var str = res;
+                        var prefix = str.substring(0, 3);
+                        var suffix = str.substring(7);
+                        var phone = prefix + "****" + suffix;
+                        $("#showInfo").append("<p class='pp' style='margin-top: 30px'>一条包含验证码的信息已发送至你的 手机" + "<span style='color: red;font-weight: bolder'>" + phone + "</span>" + "请注意查收!</p>");
+                        timer = setInterval(startTime, 1000);
+                    }
+                }
+            });
+        }
+
+        var lastTime = 60;
+
+        //
+        function startTime() {
+            lastTime--;
+            $("#time").css("display", "block");
+            $("#time").text(lastTime + "秒后重新发送");
+            if (lastTime == 0) {
+                $("#time").html("<p style='color: #1E9FFF'>没有收到验证码？点此重发</p>");
+                lastTime = 60;
+                clearInterval(timer);
+            }
+        }
+
+        $("#time").click(function () {
+
+            $.ajax({
+                url: '/send/sendMessage',
+                method: 'post',
+                data: {
+                    phone: phoneNum,
+                    userIdentify: userIdentify
+                },
+                success: function (data) {
+                    if (data.status) {
+                        timer = setInterval(startTime, 1000);
+                    }
+                }
+            });
+        })
+
+    });
+
+</script>
+</body>
+</html>

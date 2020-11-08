@@ -4,6 +4,7 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.*;
 
+@SuppressWarnings("ALL")
 @Data
 @Accessors(chain = true)
 public class User implements Serializable {
@@ -13,6 +14,8 @@ public class User implements Serializable {
   private String password;
   private Integer age;
   private String sex;
-  private Integer phone;
+  private String phone;
+  private String email;
+  private String userdesc;
 
 }
