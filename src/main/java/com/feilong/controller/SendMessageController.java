@@ -30,7 +30,7 @@ import static com.feilong.utils.MessageUtil.templateCode;
 @RequestMapping("/send")
 public class SendMessageController {
 
-
+    private final Jedis jedis=new Jedis("47.115.91.98",6379);
     @PostMapping("/sendMessage1")
     public AjaxMessage sendMessage1(String phone, HttpServletRequest req) {
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", MessageUtil.accessKeyId, MessageUtil.accessKeySecret);
@@ -38,8 +38,8 @@ public class SendMessageController {
         String message = MessageUtil.setRandomNumber();
         System.out.println(message);
         //把验证码存储在redis中
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         Boolean result1 = jedis.exists("message1");
         if (result1) {
             Long aLong = jedis.del("message1");
@@ -80,8 +80,8 @@ public class SendMessageController {
         System.out.println(message);
 
         //把验证码存储在redis中
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         Boolean result1 = jedis.exists("message");
         if (result1) {
             Long aLong = jedis.del("message");

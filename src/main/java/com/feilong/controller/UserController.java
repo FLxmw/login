@@ -1,9 +1,11 @@
 package com.feilong.controller;
 
 import com.feilong.config.AjaxMessage;
+import com.feilong.config.TableData;
 import com.feilong.entity.User;
 import com.feilong.service.UserService;
 import com.feilong.utils.Base64Utils;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * (User)表控制层
@@ -29,7 +32,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private final Jedis jedis = new Jedis("47.115.91.98", 6379);
 
+    @GetMapping("/showUsers")
+    @ResponseBody
+    public TableData<User> showUsers(int page, int limit) {
+        PageInfo<User> pageInfo = userService.showUsers(page, limit);
+        List<User> userList = pageInfo.getList();
+        long total = pageInfo.getTotal();
+        TableData<User> tableData = new TableData<User>().setData(userList).setCount(total);
+        return tableData;
+    }
 
 
     @PostMapping("/addUser")
@@ -103,8 +116,8 @@ public class UserController {
     @PostMapping("/checkMessage")
     @ResponseBody
     public AjaxMessage checkMessage(String message) {
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         String redisMessage = jedis.get("message");
         if (redisMessage == null) {
             return new AjaxMessage(false, "验证码已过时，请重新发送！");
@@ -117,8 +130,8 @@ public class UserController {
 
     @RequestMapping("/toUpdatePwd")
     public String toUpdatePwd(Model model) {
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         String username = jedis.get("username");
         String message = jedis.get("message");
         //1.根据用户名查找
@@ -135,8 +148,8 @@ public class UserController {
     @RequestMapping("/toUpdatePwdEmail")
     public String toUpdatePwdEmail(String code, Model model) {
         System.out.println(code);
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         String redisCode = jedis.get("code");
         String email = jedis.get("email");
         if (code != null && redisCode != null && email != null) {
@@ -174,8 +187,8 @@ public class UserController {
     @PostMapping("/checkMsg")
     @ResponseBody
     public AjaxMessage checkMsg(String message, HttpSession session) {
-        Jedis jedis = new Jedis("10.36.134.22", 6379);
-        jedis.auth("xmw225310");
+//        Jedis jedis = new Jedis("10.36.134.22", 6379);
+//        jedis.auth("xmw225310");
         String message1 = jedis.get("message1");
         if (message1 == null) {
             return new AjaxMessage(false, "验证码已经超时，请重新发送！");

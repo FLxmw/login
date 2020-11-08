@@ -1,6 +1,8 @@
 package com.feilong.service;
 
 import com.feilong.entity.User;
+import com.github.pagehelper.PageInfo;
+
 import java.util.List;
 
 /**
@@ -60,4 +62,6 @@ public interface UserService {
     String findPhone(String username);
 
     User findUserByEmail(String email);
+
+    PageInfo<User> showUsers(int page,int limit);
 }

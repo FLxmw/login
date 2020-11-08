@@ -3,6 +3,8 @@ package com.feilong.service.impl;
 import com.feilong.entity.User;
 import com.feilong.dao.UserDao;
 import com.feilong.service.UserService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -14,6 +16,7 @@ import java.util.List;
  * @author makejava
  * @since 2020-11-06 13:46:44
  */
+@SuppressWarnings("ALL")
 @Service("userService")
 public class UserServiceImpl implements UserService {
     @Resource
@@ -34,7 +37,7 @@ public class UserServiceImpl implements UserService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     @Override
@@ -84,7 +87,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User queryAll(User user) {
-      return  userDao.queryUser(user);
+        return userDao.queryUser(user);
     }
 
     @Override
@@ -95,5 +98,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByEmail(String email) {
         return userDao.findUserByEmail(email);
+    }
+
+    @Override
+    public PageInfo<User> showUsers(int page, int limit) {
+        PageHelper.startPage(page, limit);
+        List<User> users = userDao.getUsers();
+        return new PageInfo<User>(users);
     }
 }

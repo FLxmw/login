@@ -38,6 +38,7 @@ public class EmailController {
     @Value("${spring.mail.username}")
     private String username;
 
+    private final Jedis jedis=new Jedis("47.115.91.98",6379);
     @PostMapping("/sendEmail")
     @ResponseBody
     public AjaxMessage sendEmail(String email) {
@@ -46,8 +47,8 @@ public class EmailController {
             String uuid = UUID.randomUUID().toString();
             String encode = Base64Utils.encode(uuid);
 
-            Jedis jedis = new Jedis("10.36.134.22", 6379);
-            jedis.auth("xmw225310");
+//            Jedis jedis = new Jedis("10.36.134.22", 6379);
+//            jedis.auth("xmw225310");
 
             Boolean result1 = jedis.exists("email");
             if (result1) {
